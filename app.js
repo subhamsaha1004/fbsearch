@@ -10,7 +10,9 @@
 	var CustomEventHandler = (function () {
 	  var _handlers = {}, addEvent, removeEvent, triggerEvent;
 
+	  // Enhancing node prototype with on method
 	  Node.prototype.on =  function(type, func, async, index, delegate) {
+	  	// calls native addeventlistener first
 	  	this.addEventListener(type, function(e) {
 	  		func.call(this, e, index);
 	  		if(delegate) {
@@ -22,11 +24,13 @@
 	  		}
 	  	}, async);
 
+	  	// code for custom event handling, maintaining a list of listeners
 	  	var el = (index) ? (this.toString() + index) : this;
 	  	_handlers[el] = _handlers[el] || {};
       _handlers[el][type] = _handlers[el][type] || [];
       _handlers[el][type].push(func);
 	  };
+	  // Similar approach for off method for removing listeners
 		Node.prototype.off =  function(type, func, async, index) {
 	  	this.removeEventListener(type, function(e) {
 	  		func.call(this, e, index);
@@ -42,6 +46,7 @@
       });
 	  };
 
+	  // On and Off added for Nodelists
 		NodeList.prototype.on = function(type, func, async, delegate) {
 			[].forEach.call(this, function(node, index) {
 				node.on(type, func, async, index, delegate);
@@ -75,6 +80,7 @@
 	    }
 	  };
 	  
+	  // returnning an object that provides the api for interaction with the custom handler
 	  return {
 	    add: addEvent,
 	    remove: removeEvent,
@@ -83,7 +89,7 @@
 	  };
 	}());
 
-	// App related code starts here
+	/** App related code starts here **/
 
 	// Initializing the dropdown
 	var Dropdown = (function() {
@@ -108,10 +114,11 @@
 				targetLi.classList.add('activeLi');
 
 				var el = (index) ? (this.toString() + index) : this;
-				CustomEventHandler.trigger(el, 'listChange', targetLi);
+				CustomEventHandler.trigger(el, 'listChange', targetLi); // triggering listchange event for suscribers to achieve some task
 			});
 		};
 
+		// rerturning object to provide an api for interacting with the module
 		return {
 			init: init,
 			label: label,
@@ -119,11 +126,12 @@
 		}
 	}());
 
-	Dropdown.init();
+	Dropdown.init(); // Initializing the dropdowns
 
-	// Facebook Search
+	// code for Facebook Search
 	var resultWrapper = $('.results');
 
+	// FB searcg module, contains all the code for calling the api and populating the dom
 	FBSearch = (function() {
 		var url = "https://graph.facebook.com/";
 				xhr = (function() {
@@ -139,11 +147,13 @@
 				index = 1;
 				template = null;
 
+		// wires up the event listeners, fetches the template for future use
 		var init = function() {
 			// Attaching the event handlers
 			CustomEventHandler.add($('#searchForm'), 'submit', function(e) {
 			}, { stopPropagation: true, preventDefault: true });
 
+			// button click fires the ajax search
 			CustomEventHandler.add(btn, 'click', function(e) {
 				if(!this.classList.contains('disabled')) {
 					this.classList.add('disabled');
@@ -158,6 +168,7 @@
 			templateScript.parentNode.removeChild(templateScript);
 		};
 
+		// builds the actual html from the template, very simple use case, useful for this purpose
 		var buildHTML = function(tpl, data) {
 			tpl = tpl
 				.replace(/\{\{index\}\}/, index)
@@ -175,10 +186,11 @@
 			return tpl;
 		}
 
+		// actual search functionality goes here
 		var search = function(btn) {
-			var term = input.value;
+			var term = input.value; // term to be searched for
 
-			geturl = url + term;
+			geturl = url + term; // get url like https://graph.facebook.com/pepsi
 			xhr.open('GET', geturl, true);
 
 			xhr.onreadystatechange = function() {
@@ -186,16 +198,19 @@
 					if(xhr.status == 200) {
 						var data = JSON.parse(xhr.responseText);
 						var html = template;
-						html = buildHTML(html, data);
+						html = buildHTML(html, data); // get the compiled html from the template
 
-						reArrange("-1");
-						resultWrapper.innerHTML = (index == 2) ? html : (html + resultWrapper.innerHTML);
+						reArrange("-1"); // make it descending order
+						resultWrapper.innerHTML = (index == 2) ? html : (html + resultWrapper.innerHTML); // append to the dom
+
+						// show a message
 						message.classList.add('dispBlock');
 						var timer = setTimeout(function() {
 							message.classList.remove('dispBlock');
 							clearTimeout(timer);
 						}, 1500);
 
+						// trigger listchange for the filters to initiate functionality
 						[].forEach.call(Dropdown.dropDown, function(eachDropDown, index) {
 							var el = (index) ? (eachDropDown.toString() + index) : eachDropDown;
 							var targetLi = eachDropDown.querySelector('.activeLi');
@@ -222,7 +237,7 @@
 		}
 	}());
 
-	FBSearch.init();
+	FBSearch.init(); // Initializing the Facebbook seracg module, getting it ready to search
 
 	// Filtering functionality
 	var resultCache = [];
@@ -237,6 +252,7 @@
 		}
 	}
 
+	// Sorting ascending or descending
 	function reArrange(sortorder) {
 		var currSortOrder = resultWrapper.getAttribute('data-sortorder');
 
@@ -255,6 +271,7 @@
 		}
 	}
 
+	// Show/hide the results according to the favorite filter
 	function filterFavourite(result, favorite) {
 		result.classList.remove('dispNone');
 		var selectedSpan = result.querySelector('.favorite[data-favourite="' + (favorite*-1) + '"]');
@@ -283,6 +300,7 @@
 		var favorite = target.getAttribute('data-favourite');
 		var sortorder = target.getAttribute('data-sortorder');
 
+		// triggers the favorite filter
 		if(favorite) {
 			var results = $('.result');
 			if(results) {
@@ -296,6 +314,7 @@
 			}
 		}
 
+		// triggers the sort
 		if(sortorder) {
 			reArrange(sortorder);
 		}
