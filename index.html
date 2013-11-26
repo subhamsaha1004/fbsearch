@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Projectplace Task</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+
+	<link href='http://fonts.googleapis.com/css?family=Kelly+Slab|Oleo+Script+Swash+Caps:400,700|Amaranth:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="main.css">
+</head>
+<body>
+	<div id="page">
+		<h1>Facebook Search</h1>
+		<div id="content">
+			<section class="formWrapper">
+				<div class="elementWrapper">
+					<form id="searchForm" action="#">
+						<label for="search">Search:</label>
+						<input type="text" id="search" class="inpCls" placeholder="search with keywords e.g cocacola, pepsi etc." />
+						<input type="button" class="btn" value="Search" id="searchBtn" />
+					</form>
+				</div>
+			</section>
+			<section class="searchResults">
+				<h2>Results</h2>
+				<section class="filters">
+					<!-- adding dropdown for filtering -->
+					<div class="dropDownWrapper">
+						<p>Filter By:</p>
+            <p class="label" data-dropdown="favs"><span class="text">All</span><span class="dnArrow"></span></p>
+            <ul class="dropDown dispNone" id="favs">
+              <li data-favourite="0" class="activeLi">All</li>
+              <li data-favourite="1">Favourites</li>
+              <li data-favourite="-1">Non-Favourites</li>
+            </ul>
+			    </div>
+			    <!-- end of dropdown -->
+			    <!-- adding dropdown for filtering -->
+					<div class="dropDownWrapper">
+						<p>Sort By:</p>
+            <p class="label" data-dropdown="sortOrder"><span class="text">Descending</span><span class="dnArrow"></span></p>
+            <ul class="dropDown dispNone" id="sortOrder">
+              <li data-sortorder="1">Ascending</li>
+              <li data-sortorder="-1" class="activeLi">Descending</li>
+            </ul>
+			    </div>
+			    <!-- end of dropdown -->
+			    <div class="resultIndex">
+			    	<span class="favorite selected"></span><span> - Means Favourite</span>
+			    </div>
+				</section>
+				<div class="no-result message dispNone">New result added</div>
+				<section class="results" data-sortorder="-1">
+					<div class="no-result">No searches yet. Type something into the search box and search</div>
+					<script id="template" type="text/template">
+						<div class="result">
+							<h2>
+								<span class="num">{{index}}</span>
+								<span class="rightArrow"></span>
+								<span title="Click to favorite" class="favorite" data-favourite="-1"></span>
+								<a href="{{linkTitle}}" class="linkTitle">{{linkTitle}}:</a>
+								<span class="about">{{about}}</span>
+							</h2>
+							<div class="details dispNone">
+								<p class="category"><span class="strong">Category: </span>{{category}}</p>
+								<p class="cover"><img src="{{imgSrc}}" alt=""></p>
+								<p class="desc"><span class="strong">Description: </span>{{description}}</p>
+								<p class="founded"><span class="strong">Founded: </span>{{founded}}</p>
+								<p class="website"><span class="strong">Website: </span><a href="{{website}}">{{website}}</a></p>
+								<p class="likes"><span class="strong">Likes: </span>{{likes}}</p>
+							</div>
+						</div>
+					</script>
+					
+				</section>
+			</section>
+		</div>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>
