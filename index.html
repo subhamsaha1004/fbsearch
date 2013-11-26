@@ -34,7 +34,7 @@
 						<p>Filter By:</p>
             <p class="label" data-dropdown="favs"><span class="text">All</span><span class="dnArrow"></span></p>
             <ul class="dropDown dispNone" id="favs">
-              <li data-favourite="0">All</li>
+              <li data-favourite="0" class="activeLi">All</li>
               <li data-favourite="1">Favourites</li>
               <li data-favourite="-1">Non-Favourites</li>
             </ul>
@@ -43,75 +43,40 @@
 			    <!-- adding dropdown for filtering -->
 					<div class="dropDownWrapper">
 						<p>Sort By:</p>
-            <p class="label" data-dropdown="sortOrder"><span class="text">Ascending</span><span class="dnArrow"></span></p>
+            <p class="label" data-dropdown="sortOrder"><span class="text">Descending</span><span class="dnArrow"></span></p>
             <ul class="dropDown dispNone" id="sortOrder">
               <li data-sortorder="1">Ascending</li>
-              <li data-sortorder="-1">Descending</li>
+              <li data-sortorder="-1" class="activeLi">Descending</li>
             </ul>
 			    </div>
 			    <!-- end of dropdown -->
+			    <div class="resultIndex">
+			    	<span class="favorite selected"></span><span> - Means Favourite</span>
+			    </div>
 				</section>
-				<section class="results">
-					<div class="result">
-						<h2>
-							<span class="num">1</span>
-							<span class="rightArrow"></span>
-							<span class="favorite" data-favourite="-1"></span>
-							<a href="http://www.facebook.com/coca-cola" class="linkTitle">http://www.facebook.com/coca-cola:</a>
-							<span class="about">The Coca-Cola Facebook Page is a collection of your stories showing how people from around the world have helped make Coke into what it is today.</span>
-						</h2>
-						<div class="details dispNone">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam, porro, repellat, esse voluptates ea cumque omnis dolores quasi facere tenetur dignissimos iste ab neque fugiat harum quam blanditiis corporis mollitia cupiditate in molestias assumenda nobis aperiam. Perspiciatis iure aperiam consequuntur?
+				<div class="no-result message dispNone">New result added</div>
+				<section class="results" data-sortorder="-1">
+					<div class="no-result">No searches yet. Type something into the search box and search</div>
+					<script id="template" type="text/template">
+						<div class="result">
+							<h2>
+								<span class="num">{{index}}</span>
+								<span class="rightArrow"></span>
+								<span title="Click to favorite" class="favorite" data-favourite="-1"></span>
+								<a href="{{linkTitle}}" class="linkTitle">{{linkTitle}}:</a>
+								<span class="about">{{about}}</span>
+							</h2>
+							<div class="details dispNone">
+								<p class="category"><span class="strong">Category: </span>{{category}}</p>
+								<p class="cover"><img src="{{imgSrc}}" alt=""></p>
+								<p class="desc"><span class="strong">Description: </span>{{description}}</p>
+								<p class="founded"><span class="strong">Founded: </span>{{founded}}</p>
+								<p class="website"><span class="strong">Website: </span><a href="{{website}}">{{website}}</a></p>
+								<p class="likes"><span class="strong">Likes: </span>{{likes}}</p>
+							</div>
 						</div>
-					</div>
-					<div class="result">
-						<h2>
-							<span class="num">2</span>
-							<span class="rightArrow"></span>
-							<span class="favorite" data-favourite="-1"></span>
-							<a href="http://www.facebook.com/coca-cola" class="linkTitle">http://www.facebook.com/coca-cola:</a>
-							<span class="about">The Coca-Cola Facebook Page is a collection of your stories showing how people from around the world have helped make Coke into what it is today.</span>
-						</h2>
-						<div class="details dispNone">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum, suscipit, dolorem, quidem numquam esse alias rerum quas consectetur sapiente facilis itaque ipsa ad excepturi possimus voluptatem vitae eius impedit porro est ratione. Et, dolorum, nemo, cumque, deleniti reiciendis cupiditate expedita quidem maiores asperiores.
-						</div>
-					</div>
-					<div class="result">
-						<h2>
-							<span class="num">3</span>
-							<span class="rightArrow"></span>
-							<span class="favorite" data-favourite="-1"></span>
-							<a href="http://www.facebook.com/coca-cola" class="linkTitle">http://www.facebook.com/coca-cola:</a>
-							<span class="about">The Coca-Cola Facebook Page is a collection of your stories showing how people from around the world have helped make Coke into what it is today.</span>
-						</h2>
-						<div class="details dispNone">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum, suscipit, dolorem, quidem numquam esse alias rerum quas consectetur sapiente facilis itaque ipsa ad excepturi possimus voluptatem vitae eius impedit porro est ratione. Et, dolorum, nemo, cumque, deleniti reiciendis cupiditate expedita quidem maiores asperiores.
-						</div>
-					</div>
-					<div class="result">
-						<h2>
-							<span class="num">4</span>
-							<span class="rightArrow"></span>
-							<span class="favorite" data-favourite="-1"></span>
-							<a href="http://www.facebook.com/coca-cola" class="linkTitle">http://www.facebook.com/coca-cola:</a>
-							<span class="about">The Coca-Cola Facebook Page is a collection of your stories showing how people from around the world have helped make Coke into what it is today.</span>
-						</h2>
-						<div class="details dispNone">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum, suscipit, dolorem, quidem numquam esse alias rerum quas consectetur sapiente facilis itaque ipsa ad excepturi possimus voluptatem vitae eius impedit porro est ratione. Et, dolorum, nemo, cumque, deleniti reiciendis cupiditate expedita quidem maiores asperiores.
-						</div>
-					</div>
-					<div class="result">
-						<h2>
-							<span class="num">5</span>
-							<span class="rightArrow"></span>
-							<span class="favorite" data-favourite="-1"></span>
-							<a href="http://www.facebook.com/coca-cola" class="linkTitle">http://www.facebook.com/coca-cola:</a>
-							<span class="about">The Coca-Cola Facebook Page is a collection of your stories showing how people from around the world have helped make Coke into what it is today.</span>
-						</h2>
-						<div class="details dispNone">
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatum, suscipit, dolorem, quidem numquam esse alias rerum quas consectetur sapiente facilis itaque ipsa ad excepturi possimus voluptatem vitae eius impedit porro est ratione. Et, dolorum, nemo, cumque, deleniti reiciendis cupiditate expedita quidem maiores asperiores.
-						</div>
-					</div>
+					</script>
+					
 				</section>
 			</section>
 		</div>

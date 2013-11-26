@@ -10,10 +10,18 @@
 	var CustomEventHandler = (function () {
 	  var _handlers = {}, addEvent, removeEvent, triggerEvent;
 
-	  Node.prototype.on =  function(type, func, async, index) {
+	  Node.prototype.on =  function(type, func, async, index, delegate) {
 	  	this.addEventListener(type, function(e) {
 	  		func.call(this, e, index);
+	  		if(delegate) {
+	  			if(delegate.stopPropagation){
+		  			e.stopPropagation();
+		  		} else if (delegate.preventDefault) {
+		  			e.preventDefault();
+		  		}
+	  		}
 	  	}, async);
+
 	  	var el = (index) ? (this.toString() + index) : this;
 	  	_handlers[el] = _handlers[el] || {};
       _handlers[el][type] = _handlers[el][type] || [];
@@ -23,6 +31,7 @@
 	  	this.removeEventListener(type, function(e) {
 	  		func.call(this, e, index);
 	  	}, async);
+
 	  	var el = (index) ? (this.toString() + index) : this;
 	  	[].forEach.call(_handlers[el][type], function (fun, index) {
         if (fun === func) {
@@ -33,9 +42,9 @@
       });
 	  };
 
-		NodeList.prototype.on = function(type, func, async) {
+		NodeList.prototype.on = function(type, func, async, delegate) {
 			[].forEach.call(this, function(node, index) {
-				node.on(type, func, async, index);
+				node.on(type, func, async, index, delegate);
 			});
 		};
 		NodeList.prototype.off = function(type, func, async) {
@@ -45,8 +54,8 @@
 		};
 	  
 	  // addEvent
-	  addEvent = function (el, evt, fn) {
-      el.on(evt, fn, false);
+	  addEvent = function (el, evt, fn, delegate) {
+      el.on(evt, fn, false, delegate);
     };
 
 	  // removeEvent
@@ -57,6 +66,7 @@
 	  // triggerEvent
 	  triggerEvent = function (el, evt) {
 	  	var args = [].slice.call(arguments, 2);
+
 	    _handlers[el] = _handlers[el] || {};
 	    _handlers[el][evt] = _handlers[el][evt] || [];
 
@@ -92,6 +102,10 @@
 
 				$('.label[data-dropdown="' + this.id + '"] .text').innerHTML = targetLi.textContent;
 				this.classList.remove('dispInlineBlock');
+				[].forEach.call(this.querySelectorAll('.activeLi'), function(li) {
+					li.classList.remove('activeLi');
+				});
+				targetLi.classList.add('activeLi');
 
 				var el = (index) ? (this.toString() + index) : this;
 				CustomEventHandler.trigger(el, 'listChange', targetLi);
@@ -108,61 +122,148 @@
 	Dropdown.init();
 
 	// Facebook Search
+	var resultWrapper = $('.results');
+
 	FBSearch = (function() {
 		var url = "https://graph.facebook.com/";
-				xhr = new XMLHttpRequest(),
+				xhr = (function() {
+					if (window.XMLHttpRequest) { // latest browsers
+					  return new XMLHttpRequest();
+					} else if (window.ActiveXObject) { // IE 8 and older
+					  return new ActiveXObject("Microsoft.XMLHTTP");
+					}
+				}()),
 				input = $('#search'),
-				btn = $('#searchBtn');
+				btn = $('#searchBtn'),
+				message = $('.message'),
+				index = 1;
+				template = null;
 
 		var init = function() {
-			$('#searchForm').addEventListener('submit', function(e) {
-				return false;
-			}, false);
+			// Attaching the event handlers
+			CustomEventHandler.add($('#searchForm'), 'submit', function(e) {
+			}, { stopPropagation: true, preventDefault: true });
 
-			btn.addEventListener('click', function(e) {
-				search();
-				return false;
-			}, false);
+			CustomEventHandler.add(btn, 'click', function(e) {
+				if(!this.classList.contains('disabled')) {
+					this.classList.add('disabled');
+					this.value = "Searching...";
+					search(this);
+				}
+			}, { stopPropagation: true, preventDefault: true });
+
+			// fetching the template
+			var templateScript = $("#template");
+			template = templateScript.innerHTML;
+			templateScript.parentNode.removeChild(templateScript);
+		};
+
+		var buildHTML = function(tpl, data) {
+			tpl = tpl
+				.replace(/\{\{index\}\}/, index)
+				.replace(/\{\{linkTitle\}\}/g, data.link || "No Information")
+				.replace(/\{\{about\}\}/, data.about || "No Information")
+				.replace(/\{\{category\}\}/, data.category || "No Information")
+				.replace(/\{\{imgSrc\}\}/, (data.cover) ? data.cover.source : "No Information")
+				.replace(/\{\{description\}\}/, data.description || "No Information")
+				.replace(/\{\{founded\}\}/, data.founded || "No Information")
+				.replace(/\{\{website\}\}/g, data.website || "No Information")
+				.replace(/\{\{likes\}\}/, data.likes || "No Information");
+
+			index++;
+
+			return tpl;
 		}
 
-		var search = function() {
+		var search = function(btn) {
 			var term = input.value;
 
 			geturl = url + term;
-			xhr.open('get', geturl, false);
-			xhr.onreadystatechange = function(response) {
-				console.log(response);
-				if(response.status == 200 && response.readyState == 4) {
-					var data = JSON.parse(response);
-					console.log(data);
+			xhr.open('GET', geturl, true);
+
+			xhr.onreadystatechange = function() {
+				if(xhr.readyState == 4) {
+					if(xhr.status == 200) {
+						var data = JSON.parse(xhr.responseText);
+						var html = template;
+						html = buildHTML(html, data);
+
+						reArrange("-1");
+						resultWrapper.innerHTML = (index == 2) ? html : (html + resultWrapper.innerHTML);
+						message.classList.add('dispBlock');
+						var timer = setTimeout(function() {
+							message.classList.remove('dispBlock');
+							clearTimeout(timer);
+						}, 1500);
+
+						[].forEach.call(Dropdown.dropDown, function(eachDropDown, index) {
+							var el = (index) ? (eachDropDown.toString() + index) : eachDropDown;
+							var targetLi = eachDropDown.querySelector('.activeLi');
+							CustomEventHandler.trigger(el, 'listChange', targetLi);
+						});
+					}
+
+					btn.classList.remove('disabled');
+					btn.value = "Search";
 				}
 			};
 
-			xhr.onerror = function(response) {
-				var error = JSON.parse(response);
-				console.log(error);
+			xhr.onerror = function() {
+				// Error handling code here
 			};
 
-			xhr.send();
+			xhr.send(null);
 		};
 
 		return {
 			url: url,
-			init: init
+			init: init,
+			template: template
 		}
 	}());
 
 	FBSearch.init();
 
 	// Filtering functionality
-	var results = $('.result'),
-			resultWrapper = $('.results'),
-			resultCache = [];
+	var resultCache = [];
 
-	[].forEach.call(results, function(result) {
-		resultCache.push(result);
-	});
+	function populateCache() {
+		resultCache = [];
+		var results = $('.result');
+		if(results) {
+			[].forEach.call(results, function(result) {
+				resultCache.push(result);
+			});
+		}
+	}
 
+	function reArrange(sortorder) {
+		var currSortOrder = resultWrapper.getAttribute('data-sortorder');
+
+		if(currSortOrder !== sortorder) {
+			populateCache();
+			if(resultCache.length) {
+				resultCache.reverse();
+				resultWrapper.innerHTML = "";
+				var frag = doc.createDocumentFragment();
+				resultCache.forEach(function(result) {
+					frag.appendChild(result);
+				});
+				resultWrapper.appendChild(frag);
+				resultWrapper.setAttribute('data-sortorder', sortorder);
+			}
+		}
+	}
+
+	function filterFavourite(result, favorite) {
+		result.classList.remove('dispNone');
+		var selectedSpan = result.querySelector('.favorite[data-favourite="' + (favorite*-1) + '"]');
+		if(selectedSpan) {
+			selectedSpan.parentNode.parentNode.classList.add('dispNone');
+		}
+	}
+
+	// Event handler for the results
 	CustomEventHandler.add(resultWrapper, 'click', function(e) {
 		var target = e.target;
 
@@ -177,29 +278,26 @@
 		}
 	});
 
+	// Event handler for the filters, handles all filtering activity
 	CustomEventHandler.add(Dropdown.dropDown, 'listChange', function(target) {
 		var favorite = target.getAttribute('data-favourite');
 		var sortorder = target.getAttribute('data-sortorder');
 
 		if(favorite) {
-			[].forEach.call(results, function(result) {
-				result.classList.remove('dispNone');
-				var selectedSpan = result.querySelector('.favorite[data-favourite="' + (favorite*-1) + '"]');
-				if(selectedSpan) {
-					selectedSpan.parentNode.parentNode.classList.add('dispNone');
+			var results = $('.result');
+			if(results) {
+				if([].slice.call(results).length > 1) {
+					[].forEach.call(results, function(result) {
+						filterFavourite(result, favorite);
+					});
+				} else {
+					filterFavourite(results, favorite);
 				}
-			});
+			}
 		}
 
 		if(sortorder) {
-			console.log(sortorder);
-			resultCache.reverse();
-			resultWrapper.innerHTML = "";
-			var frag = doc.createDocumentFragment();
-			resultCache.forEach(function(result) {
-				frag.appendChild(result);
-			});
-			resultWrapper.appendChild(frag);
+			reArrange(sortorder);
 		}
 		
 	});
