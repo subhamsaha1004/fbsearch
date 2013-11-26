@@ -50,7 +50,7 @@ table {
 }
 
 h1, h2, h3, h4, h5, h6 { color: #3498db; margin: 10px 0; font-family: 'Amaranth', sans-serif; font-weight: 400; }
-h2 { font-size: 1.4em; margin-top: 0; border-bottom: 1px solid; padding-left: 3px; }
+h2 { font-size: 1.4em; margin-top: 0; border-bottom: 1px solid; padding-left: 3px; padding-bottom: 2px; margin-bottom: 0; }
 h3 { font-size: 1.4em }
 .floatL { float: left; }
 .floatR { float: right; }
@@ -89,7 +89,7 @@ button:hover, .btn:hover { opacity: 0.75; cursor: pointer; }
 
 /** results **/
 .result { margin-bottom: 7px; overflow: hidden; }
-.result h2 { background: #2ecc71; margin-bottom: 0; color: #fff; font-size: 0.9em; line-height: 21px; border: 0; padding: 3px 8px; position: relative; z-index: 2; }
+.result h2 { background: #2ecc71; border: 5px solid #ee1821; margin-bottom: 0; color: #fff; font-size: 0.9em; line-height: 21px; border: 0; padding: 3px 8px; position: relative; z-index: 2; }
 .favorite { cursor:pointer; display: inline-block; margin-right: 4px; width: 13px; height: 15px; border: 1px solid #000; position: relative; top: 4px; }
 .favorite.selected { background: #ff0; }
 .linkTitle { display: inline-block; margin-right: 5px; text-decoration: underline; font-size: 1.1em; color: #000; }
